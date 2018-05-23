@@ -35,39 +35,47 @@
 	<main role="main" class="container" id="moviesList">
 	<div class="p-3 my-3 text-white-50 bg-purple rounded box-shadow">
 		<div class="row">
-			<div class="col-3">
-				<select class="selectpicker" id="sortByMark" title="Trier par : " data-width="100%">
+			<div class="col-4">
+				<select class="selectpicker" id="sortByMark" title="Trier par : "
+					data-width="100%">
 					<option title="Trier par : Note globale" value="global" selected>Note globale</option>
 					<option title="Trier par : Note Sens Critique" value="sc">Note Sens Critique</option>
 					<option title="Trier par : Note Allociné" value="allocine">Note Allociné</option>
 				</select>
 			</div>
 			<div class="col-3">
-				<select class="selectpicker" id="days" title="Filtrer jour : "
-					data-width="100%" data-selected-text-format="count > 2" multiple>
-					<option>Aujourd'hui</option>
-					<option>Demain</option>
+				<select class="selectpicker" id="daysFilter" v-model="selectedDays"
+					title="Filtrer jour : " data-width="100%"
+					data-selected-text-format="count > 2" multiple>
+					<option v-for="day in days" :value="day"
+						selected>{{day}}</option>
 				</select>
 			</div>
 			<div class="col-5">
-				<select class="selectpicker" id="theaters" ref="selectedTheaters" v-model="selectedTheaters"
-					title="Filtrer salle : " data-width="100%"
-					data-selected-text-format="count > 2" multiple>
-					<option v-for="theater in theaters" :value="theater.theaterId" selected>{{theater.name}}</option>
+				<select class="selectpicker" id="theatersFilter"
+					v-model="selectedTheaters" title="Filtrer salle : "
+					data-width="100%" data-selected-text-format="count > 2" multiple>
+					<option v-for="theater in theaters" :value="theater.theaterId"
+						selected>{{theater.name}}</option>
 				</select>
 			</div>
 		</div>
 	</div>
 
 	<div class="container">
-		<template v-for="movie in movies" v-if="containsSelectedTheater(movie.theaters)">
+		<template v-for="movie in movies"
+			v-if="containsSelectedTheater(movie.theaters)">
 		<div class="card mt-3">
 			<div class="card-header">
 				<ul class="nav nav-tabs card-header-tabs">
-					<li class="nav-item"><a class="nav-link active"
-						data-toggle="tab" v-bind="{ href: '#m'+movie.id }">Fiche</a></li>
-					<li class="nav-item"><a class="nav-link" data-toggle="tab"
-						v-bind="{ href: '#s'+movie.id }" href="#sessions">Séances</a></li>
+					<li class="nav-item">
+						<a class="nav-link active" data-toggle="tab"
+							v-bind="{ href: '#m'+movie.id }">Fiche</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="tab"
+							v-bind="{ href: '#s'+movie.id }" href="#sessions">Séances</a>
+					</li>
 				</ul>
 			</div>
 

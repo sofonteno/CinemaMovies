@@ -10,11 +10,13 @@ var moviesList = new Vue({
 	data : {
 		movies: [],
 		theaters: [],
-		selectedTheaters: []
+		days: [],
+		selectedTheaters: [],
+		selectedDays: []
 	},
 	beforeCreate: function () {
 	    var firstLoad = true;
-	 },
+	},
 	created() {
 		 axios.get(moviesUrl, {
 	          transformResponse: axios.defaults.transformResponse.concat(function (data, headers) {
@@ -22,16 +24,17 @@ var moviesList = new Vue({
 	            	  
 	            	  movie.daySessions.forEach(function(daySession) {  
 
-	            		  daySession.hourSessions = daySession.hourSessions.sort(compareHourSessionsAsc);
+	            		  daySession.hourSessions = _.sortBy(daySession.hourSessions, function(s){return s.hour;});
 	            	  });
-	            	  movie.daySessions = movie.daySessions.sort(compareDaySessionsAsc);
+	            	  movie.daySessions = _.sortBy(movie.daySessions, function(d){return d.day;});
 	              });
 	              return data;
 	            })
 	          })
 		 .then(response => {
-			 this.movies = response.data.movies.sort(compareMarkDescGlobal);
+			 this.movies = _.sortBy(response.data.movies, function(m){return -m.averageMark;});
 			 this.theaters = response.data.theaters;
+			 this.days = this.getAllDays();
 		 })
 		 .catch(e => {
 			 console.log(e);
@@ -40,9 +43,10 @@ var moviesList = new Vue({
 	 updated: function() {
 		this.hideReadMore();
 		 
-		$(this.$refs.selectedTheaters).selectpicker('refresh');
+		$("#theatersFilter").selectpicker('refresh');
 		if(firstLoad){
-			$("#theaters").selectpicker('selectAll');
+			$("#theatersFilter").selectpicker('selectAll');
+			$("#daysFilter").selectpicker('selectAll');
 			firstLoad = false;
 		}
 	 },
@@ -63,13 +67,21 @@ var moviesList = new Vue({
 				}
 			});
 		},
+		
 		containsSelectedTheater: function(theaters) {
 			var movieTheatersIds = _.pluck(theaters, 'theaterId');
 			return _.some(movieTheatersIds, function(id) { return _.contains(moviesList.selectedTheaters, id); }); 
-		 }
+		},
+		
+		getAllDays: function() {
+			
+			var sessions = _.pluck(this.movies, 'daySessions');
+			console.log(sessions);
+		}
 	 }
 	 
 });
+
 
 $(function() {
 	$('#sortByMark').on('change', function(){
@@ -77,73 +89,10 @@ $(function() {
 	   var selected = $('.selectpicker option:selected').val();
 	   
 	   if(selected == 'sc') {
-		   moviesList.movies = moviesList.movies.sort(compareMarkDescSc);
+		   moviesList.movies = _.sortBy(moviesList.movies, function(m){return -m.marks.SensCritique;});
 	   } else if (selected == 'allocine') {
-		   moviesList.movies = moviesList.movies.sort(compareMarkDescAllocine);
+		   moviesList.movies = _.sortBy(moviesList.movies, function(m){return -m.marks.Allocine;});
 	   }
 	});
+	
 });
-// Vue.directive('sort', {
-// bind: function() {
-// $(this.el).selectpicker().on("change", function(e) {
-// this.set($(this.el).val());
-// }.bind(this));
-// },
-// update: function (value) {
-// $(this.el).selectpicker('refresh').trigger("change");
-// }
-// });
-
-
-
-function compareHourSessionsAsc(a, b) {
-	if (a.hour > b.hour)
-        return 1;
-      if (a.hour < b.hour)
-        return -1;
-      return 0;
-};
-
-function compareHourSessionsDesc(a, b) {
-	return -compareHourSessionsAsc(a, b);
-};
-
-function compareDaySessionsAsc(a, b) {
-	if (a.day > b.day)
-        return 1;
-      if (a.day < b.day)
-        return -1;
-      return 0;
-};
-
-function compareDaySessionsDesc(a, b) {
-	return -compareDaySessionsAsc(a, b);
-};
-
-function compareMarkDescGlobal(a, b) {
-    if (a.averageMark < b.averageMark)
-      return 1;
-    if (a.averageMark > b.averageMark)
-      return -1;
-    return 0;
-  }
-
-function compareMarkDescSc(a, b) {
-    if (a.marks.SensCritique < b.marks.SensCritique)
-      return 1;
-    if (a.marks.SensCritique > b.marks.SensCritique)
-      return -1;
-    return 0;
-  }
-
-function compareMarkDescAllocine(a, b) {
-    if (a.marks.Allocine < b.marks.Allocine)
-      return 1;
-    if (a.marks.Allocine > b.marks.Allocine)
-      return -1;
-    return 0;
-  }
-
-function compareMarkAscGlobal(a, b) {
-    return -compareMarkDescGlobal(a, b);
-  }
