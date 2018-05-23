@@ -1,0 +1,36 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+          http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
+
+	<display-name>cinema-movies</display-name>
+
+	<welcome-file-list>
+		<welcome-file>hello.jsp</welcome-file>
+	</welcome-file-list>
+
+	<servlet>
+		<servlet-name>jersey-serlvet</servlet-name>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>jersey.config.server.provider.packages</param-name>
+			<param-value>fr.me.interfaces.ws</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jersey-serlvet</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>WebjarsServlet</servlet-name>
+		<servlet-class>org.webjars.servlet.WebjarsServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebjarsServlet</servlet-name>
+		<url-pattern>/webjars/*</url-pattern>
+	</servlet-mapping>
+
+</web-app>
